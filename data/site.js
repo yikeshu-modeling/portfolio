@@ -27,5 +27,6 @@ window.SITE = {
     huashu: '华数杯',
     apmcm: '亚太杯',
     jiangxi: '江西研赛',
+    xiaosai: '校赛（国赛选拔）',
   },
 };
