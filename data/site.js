@@ -24,5 +24,6 @@ window.SITE = {
   赛事: {
     guosai: '国赛（高教社杯）',
     huawei: '研赛（华为杯）',
+    huashu: '华数杯',
   },
 };
