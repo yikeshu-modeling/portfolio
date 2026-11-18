@@ -26,5 +26,6 @@ window.SITE = {
     huawei: '研赛（华为杯）',
     huashu: '华数杯',
     apmcm: '亚太杯',
+    jiangxi: '江西研赛',
   },
 };
