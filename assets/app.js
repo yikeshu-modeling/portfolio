@@ -177,15 +177,12 @@ function loadPage(el) {
   el.dataset.done = '1';
   const src = el.dataset.src;
   const lq = el.dataset.lqip;
-  // 先铺低清占位图（约 4KB），几乎立刻有画面
-  if (lq) {
-    el.style.backgroundImage = `url("${lq}")`;
-    el.classList.add('ok');
-  }
+  // 低清占位铺在图片之上（CSS blur + 淡出），原图到了才消失
+  if (lq && !el.style.getPropertyValue('--lq')) el.style.setProperty('--lq', `url("${lq}")`);
   // 第 1 页要拿真实尺寸统一整篇比例；其余页比例已知，直接挂图，少一次解码
   if (el.dataset.n !== '1') {
     const im = new Image();
-    im.onload = () => { el.style.backgroundImage = `url("${src}")`; };
+    im.onload = () => { el.style.backgroundImage = `url("${src}")`; el.classList.add('ok'); };
     im.src = src;
     return;
   }
@@ -218,10 +215,9 @@ function showDoc(title, comp, urls, poster, lqipBase) {
   v.scrollTop = 0;
   document.title = title + ' · ' + (T.标题 || '数学建模作品集');
   const pgs = v.querySelectorAll('.pg');
-  // 先用卡片上已经缓存好的封面把第一页顶上，几秒的空窗就没了
+  // 第一页用已缓存的封面当占位，比低清图更清楚
   if (poster && pgs[0]) {
-    pgs[0].style.backgroundImage = `url("${poster}")`;
-    pgs[0].classList.add('ok');
+    pgs[0].style.setProperty('--lq', `url("${poster}")`);
   }
   if (io) io.disconnect();
   io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && my === seq) loadPage(e.target); }), { root: v, rootMargin: '600px 0px' });
