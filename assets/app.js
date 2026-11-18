@@ -196,10 +196,29 @@ if (NT && !/[?&]nowelcome/.test(location.search)) {
 /* 二维码 */
 const closeNotice = () => { $('#notice').hidden = true; };
 $('#ngo').onclick = closeNotice;
+
+const WX = String(T.微信号 || '').trim();
+$('#wxid').textContent = WX;
 $('#contact').onclick = () => {
   const im = $('#modal img');
   if (im.dataset.fresh != null) { im.src = 'contact.jpg?v=' + Date.now(); delete im.dataset.fresh; }
   $('#modal').hidden = false;
+};
+
+/* 复制微信号：优先用剪贴板 API，老浏览器回退到 execCommand */
+$('#mcopy').onclick = async () => {
+  const btn = $('#mcopy');
+  const ok = () => { btn.textContent = '已复制 ✓'; setTimeout(() => { btn.textContent = T.复制微信号 || '复制微信号'; }, 1500); };
+  try {
+    await navigator.clipboard.writeText(WX);
+    ok();
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = WX; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); ok(); } catch (_) { btn.textContent = '复制失败，请手动选择'; }
+    document.body.removeChild(ta);
+  }
 };
 $('#mclose').onclick = () => { $('#modal').hidden = true; };
 $('#modal').onclick = e => { if (e.target.id === 'modal') $('#modal').hidden = true; };
