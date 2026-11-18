@@ -25,5 +25,6 @@ window.SITE = {
     guosai: '国赛（高教社杯）',
     huawei: '研赛（华为杯）',
     huashu: '华数杯',
+    apmcm: '亚太杯',
   },
 };
