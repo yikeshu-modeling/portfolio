@@ -94,7 +94,7 @@ function renderCalendar() {
     const time = [x.报名截止 && '报名截止 ' + x.报名截止, x.比赛时间 && '比赛 ' + x.比赛时间]
       .filter(Boolean).map(esc).join('　·　');
     return `<article class="ev" style="--i:${i}">
-      ${x.图 ? `<div class="ev-cover"><img src="${esc(x.图)}" alt="" loading="lazy"></div>` : ''}
+      ${x.图 ? `<div class="ev-cover" style="aspect-ratio:${esc(x.图比例 || '16/5')}"><img src="${esc(x.图)}" alt="" loading="lazy"></div>` : ''}
       <div class="ev-body">
         <h3>${esc(x.名称)}</h3>
         ${time ? `<p class="ev-time">${time}</p>` : ''}
