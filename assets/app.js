@@ -159,6 +159,13 @@ function render() {
     </section>`;
   }
   $('#main').innerHTML = h || `<p class="none">暂无作品</p>`;
+
+  // 悬停 / 手指按下时先拉第一篇第一页，点开即显示
+  $('#main').querySelectorAll('.card').forEach(btn => {
+    const warm = () => { const im = new Image(); im.src = `pages/${btn.dataset.id}/1.webp`; };
+    btn.addEventListener('pointerenter', warm, { once: true });
+    btn.addEventListener('touchstart', warm, { once: true, passive: true });
+  });
 }
 
 /* ---------------- 论文阅读器 ----------------
@@ -169,13 +176,16 @@ function loadPage(el) {
   if (el.dataset.done) return;
   el.dataset.done = '1';
   const src = el.dataset.src;
+  // 第 1 页要拿真实尺寸统一整篇比例；其余页比例已知，直接挂图，少一次解码
+  if (el.dataset.n !== '1') {
+    el.style.backgroundImage = `url("${src}")`;
+    el.classList.add('ok');
+    return;
+  }
   const probe = new Image();
   probe.onload = () => {
     const ratio = probe.naturalWidth + '/' + probe.naturalHeight;
-    // 第一页出来时，把同一篇所有页的比例一次定好，避免边加载边跳
-    if (el.dataset.n === '1') {
-      $('#view').querySelectorAll('.pg').forEach(x => { x.style.aspectRatio = ratio; });
-    }
+    $('#view').querySelectorAll('.pg').forEach(x => { x.style.aspectRatio = ratio; });
     el.style.aspectRatio = ratio;
     el.style.backgroundImage = `url("${src}")`;
     el.classList.add('ok');
@@ -207,7 +217,7 @@ function showDoc(title, comp, urls, poster) {
     pgs[0].classList.add('ok');
   }
   if (io) io.disconnect();
-  io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && my === seq) loadPage(e.target); }), { root: v, rootMargin: '900px 0px' });
+  io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && my === seq) loadPage(e.target); }), { root: v, rootMargin: '600px 0px' });
   pgs.forEach(el => io.observe(el));
   loadPage(pgs[0]);
 }

@@ -70,7 +70,8 @@ main{padding:40px 48px 80px}
 #pageno{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 #view{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:20px 16px 40px;background:var(--bg2);scroll-behavior:smooth}
 .pg{position:relative;width:100%;max-width:900px;margin:0 auto 16px;background:#fff;border-radius:6px;box-shadow:var(--shadow);overflow:hidden;
-  aspect-ratio:210/297;background-size:100% 100%;background-repeat:no-repeat;background-position:top center}
+  aspect-ratio:210/297;background-size:100% 100%;background-repeat:no-repeat;background-position:top center;
+  content-visibility:auto;contain-intrinsic-size:900px 1273px}
 .pg:not(.ok){background:linear-gradient(100deg,#f2f3f7 30%,#e8eaf1 50%,#f2f3f7 70%) #f2f3f7;background-size:300% 100%;animation:shine 1.4s ease-in-out infinite}
 @keyframes shine{from{background-position:100% 0}to{background-position:-100% 0}}
 .vmsg{max-width:900px;margin:40px auto;text-align:center;color:var(--muted);font-size:15px}
