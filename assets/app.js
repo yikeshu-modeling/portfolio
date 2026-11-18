@@ -94,13 +94,14 @@ function renderCalendar() {
     const time = [x.报名截止 && '报名截止 ' + x.报名截止, x.比赛时间 && '比赛 ' + x.比赛时间]
       .filter(Boolean).map(esc).join('　·　');
     return `<article class="ev" style="--i:${i}">
-      ${x.图 ? `<div class="ev-cover" style="aspect-ratio:${esc(x.图比例 || '16/5')}"><img src="${esc(x.图)}" alt="" loading="lazy"></div>` : ''}
+      ${x.图 ? `<div class="ev-cover" style="aspect-ratio:${esc(x.图比例 || '16/5')}"><img src="${esc(x.图)}" alt="" loading="lazy" style="object-position:${esc(x.图位置 || 'center')}"></div>` : ''}
       <div class="ev-body">
         <h3>${esc(x.名称)}</h3>
         ${time ? `<p class="ev-time">${time}</p>` : ''}
         ${cells ? `<div class="ev-grid">${cells}</div>` : ''}
         <div class="ev-actions">
-          ${x.官网 ? `<a href="${esc(x.官网)}" target="_blank" rel="noopener noreferrer">竞赛官网 ↗</a>` : ''}
+          ${x.官网 ? `<a href="${esc(x.官网)}" target="_blank" rel="noopener noreferrer">${esc(x.官网名 || '竞赛官网')} ↗</a>` : ''}
+          ${x.公众号 ? `<button data-qr="${i}">官方公众号</button>` : ''}
           ${x.通知 ? `<button data-notice="${i}">报名通知</button>` : ''}
         </div>
       </div>
@@ -120,6 +121,15 @@ function renderCalendar() {
       const x = list[+btn.dataset.notice];
       const n = +x.通知页数 || 1;
       showDoc(x.名称 + ' · 报名通知', '', Array.from({ length: n }, (_, k) => `${x.通知}/${k + 1}.webp`));
+    };
+  });
+
+  // 官方公众号 → 二维码放大
+  $('#main').querySelectorAll('[data-qr]').forEach(btn => {
+    btn.onclick = () => {
+      const x = list[+btn.dataset.qr];
+      $('#light img').src = x.公众号;
+      $('#light').hidden = false;
     };
   });
 }
