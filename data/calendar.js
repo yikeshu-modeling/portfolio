@@ -79,8 +79,7 @@ window.CALENDAR = {
       官网: 'https://www.saikr.com/vse/mcmicm27',
       官网名: '报名官网',
       图: 'logos/huashu-en.jpg',
-      图比例: '16/9',
-      图位置: 'top',
+      图比例: '1400/302',
     },
   ],
 };
