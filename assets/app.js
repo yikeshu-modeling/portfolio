@@ -89,7 +89,12 @@ function loadPage(el) {
   const src = el.dataset.src;
   const probe = new Image();
   probe.onload = () => {
-    el.style.aspectRatio = probe.naturalWidth + '/' + probe.naturalHeight;
+    const ratio = probe.naturalWidth + '/' + probe.naturalHeight;
+    // 第一页出来时，把同一篇所有页的比例一次定好，避免边加载边跳
+    if (el.dataset.n === '1') {
+      $('#view').querySelectorAll('.pg').forEach(x => { x.style.aspectRatio = ratio; });
+    }
+    el.style.aspectRatio = ratio;
     el.style.backgroundImage = `url("${src}")`;
     el.classList.add('ok');
   };
@@ -116,6 +121,11 @@ function open(id) {
   v.scrollTop = 0;
   document.title = p.title + ' · ' + (T.标题 || '数学建模作品集');
   const pgs = v.querySelectorAll('.pg');
+  // 先用卡片上已经缓存好的封面把第一页顶上，几秒的空窗就没了
+  if (pgs[0]) {
+    pgs[0].style.backgroundImage = `url("thumbs/${p.id}.jpg")`;
+    pgs[0].classList.add('ok');
+  }
   if (io) io.disconnect();
   io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && my === seq) loadPage(e.target); }), { root: v, rootMargin: '900px 0px' });
   pgs.forEach(el => io.observe(el));
@@ -174,7 +184,6 @@ $('#ngo').textContent = T.进入 || '进入';
 $('#mclose').textContent = T.关闭 || '关闭';
 $('#back').textContent = T.返回 || '返回';
 $('#modal img').alt = T.二维码说明 || '';
-$('#stamp').innerHTML = esc(String(T.更新说明 || '').replace('{n}', PAPERS.length)).replace(/\n/g, '<br>');
 
 /* 进场通知（地址后加 ?nowelcome=1 可跳过，方便自己预览） */
 const NT = String(window.NOTICE_TEXT || '').trim();
