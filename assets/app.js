@@ -16,6 +16,9 @@ const PAPERS = (window.PAPERS || []).map(p => ({
 const COMPS = Object.entries(T.赛事 || {});
 const FB = window.FEEDBACK || {};
 const CAL = window.CALENDAR || {};
+// 图片也带版本号，避免浏览器拿着旧图不放
+const AV = String(T.资源版本 || '');
+const withV = u => (u && AV ? u + (u.includes('?') ? '&' : '?') + 'v=' + AV : u);
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -94,7 +97,7 @@ function renderCalendar() {
     const time = [x.报名截止 && '报名截止 ' + x.报名截止, x.比赛时间 && '比赛 ' + x.比赛时间]
       .filter(Boolean).map(esc).join('　·　');
     return `<article class="ev" style="--i:${i}">
-      ${x.图 ? `<div class="ev-cover" style="aspect-ratio:${esc(x.图比例 || '16/5')}"><img src="${esc(x.图)}" alt="" loading="lazy" style="object-position:${esc(x.图位置 || 'center')}"></div>` : ''}
+      ${x.图 ? `<div class="ev-cover" style="aspect-ratio:${esc(x.图比例 || '16/5')}"><img src="${esc(withV(x.图))}" alt="" loading="lazy" style="object-position:${esc(x.图位置 || 'center')}"></div>` : ''}
       <div class="ev-body">
         <h3>${esc(x.名称)}</h3>
         ${time ? `<p class="ev-time">${time}</p>` : ''}
@@ -120,7 +123,7 @@ function renderCalendar() {
     btn.onclick = () => {
       const x = list[+btn.dataset.notice];
       const n = +x.通知页数 || 1;
-      showDoc(x.名称 + ' · 报名通知', '', Array.from({ length: n }, (_, k) => `${x.通知}/${k + 1}.webp`));
+      showDoc(x.名称 + ' · 报名通知', '', Array.from({ length: n }, (_, k) => withV(`${x.通知}/${k + 1}.webp`)));
     };
   });
 
