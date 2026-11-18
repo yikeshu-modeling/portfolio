@@ -176,10 +176,17 @@ function loadPage(el) {
   if (el.dataset.done) return;
   el.dataset.done = '1';
   const src = el.dataset.src;
+  const lq = el.dataset.lqip;
+  // 先铺低清占位图（约 4KB），几乎立刻有画面
+  if (lq) {
+    el.style.backgroundImage = `url("${lq}")`;
+    el.classList.add('ok');
+  }
   // 第 1 页要拿真实尺寸统一整篇比例；其余页比例已知，直接挂图，少一次解码
   if (el.dataset.n !== '1') {
-    el.style.backgroundImage = `url("${src}")`;
-    el.classList.add('ok');
+    const im = new Image();
+    im.onload = () => { el.style.backgroundImage = `url("${src}")`; };
+    im.src = src;
     return;
   }
   const probe = new Image();
@@ -198,14 +205,14 @@ function loadPage(el) {
   probe.src = src;
 }
 
-function showDoc(title, comp, urls, poster) {
+function showDoc(title, comp, urls, poster, lqipBase) {
   const my = ++seq;
   const v = $('#view');
   $('#reader').style.setProperty('--c', comp ? `var(--${comp})` : 'var(--brand1)');
   $('#rt').textContent = title;
   total = urls.length;
   $('#pageno').textContent = '1 / ' + total;
-  v.innerHTML = urls.map((u, i) => `<div class="pg" data-n="${i + 1}" data-src="${esc(u)}"></div>`).join('');
+  v.innerHTML = urls.map((u, i) => `<div class="pg" data-n="${i + 1}" data-src="${esc(u)}"${lqipBase ? ` data-lqip="${esc(lqipBase)}/${i + 1}.webp"` : ''}></div>`).join('');
   $('#reader').hidden = false;
   document.body.style.overflow = 'hidden';
   v.scrollTop = 0;
@@ -227,7 +234,8 @@ function open(id) {
   if (!p) return close();
   showDoc(p.title, p.comp,
     Array.from({ length: p.pages }, (_, i) => `pages/${p.id}/${i + 1}.webp`),
-    `thumbs/${p.id}.jpg`);
+    `thumbs/${p.id}.jpg`,
+    `lqip/${p.id}`);
 }
 
 function close() {
