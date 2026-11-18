@@ -15,6 +15,7 @@ const PAPERS = (window.PAPERS || []).map(p => ({
 }));
 const COMPS = Object.entries(T.赛事 || {});
 const FB = window.FEEDBACK || {};
+const CAL = window.CALENDAR || {};
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -28,7 +29,8 @@ if (filter !== 'all' && !COMPS.some(c => c[0] === filter)) filter = 'all';
 
 const ICON = {
   notice: '<svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg>',
-  feedback: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>'
+  feedback: '<svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>'
 };
 let view = 'list';
 
@@ -36,6 +38,7 @@ let view = 'list';
 function nav() {
   const extra = [];
   if (String(window.NOTICE_TEXT || '').trim()) extra.push(['notice', T.通知页 || '通知']);
+  if (window.CALENDAR) extra.push(['calendar', CAL.页面名 || '近期赛事']);
   if ((FB.图片 || []).length) extra.push(['feedback', FB.页面名 || '反馈']);
   $('#nav2').innerHTML = extra.length
     ? '<div class="sep"></div>' + extra.map(([k, n]) =>
@@ -56,12 +59,78 @@ function renderFeedback() {
   </section>`;
 }
 
+/* ---------------- 正在报名的赛事 ---------------- */
+function parseDate(s) {
+  const m = String(s || '').trim().match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?$/);
+  if (!m) return null;
+  // 只写日期时，按当天 23:59 截止处理（不会在当天零点就消失）
+  return m[4] != null
+    ? new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5])
+    : new Date(+m[1], +m[2] - 1, +m[3], 23, 59, 59);
+}
+
+function renderCalendar() {
+  const now = new Date();
+  // 报名截止已过的自动下线
+  const list = (CAL.赛事 || []).filter(x => {
+    const d = parseDate(x.报名截止);
+    return !d || d >= now;
+  }).sort((a, b) => {
+    const da = parseDate(a.报名截止), db = parseDate(b.报名截止);
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    return da - db;
+  });
+
+  const cards = list.map((x, i) => {
+    const cross = String(x.跨校 || '').trim();
+    const crossCls = /^不允许|否|禁止/.test(cross) ? 'no' : cross ? 'yes' : '';
+    const cells = [
+      x.报名费 && `<div><span>报名费</span><b>${esc(x.报名费)}</b></div>`,
+      x.获奖比例 && `<div><span>获奖比例</span><b>${esc(x.获奖比例)}</b></div>`,
+      cross && `<div><span>跨校组队</span><b class="cross ${crossCls}">${esc(cross)}</b></div>`
+    ].filter(Boolean).join('');
+    const time = [x.报名截止 && '报名截止 ' + x.报名截止, x.比赛时间 && '比赛 ' + x.比赛时间]
+      .filter(Boolean).map(esc).join('　·　');
+    return `<article class="ev" style="--i:${i}">
+      ${x.图 ? `<div class="ev-cover"><img src="${esc(x.图)}" alt="" loading="lazy"></div>` : ''}
+      <div class="ev-body">
+        <h3>${esc(x.名称)}</h3>
+        ${time ? `<p class="ev-time">${time}</p>` : ''}
+        ${cells ? `<div class="ev-grid">${cells}</div>` : ''}
+        <div class="ev-actions">
+          ${x.官网 ? `<a href="${esc(x.官网)}" target="_blank" rel="noopener noreferrer">竞赛官网 ↗</a>` : ''}
+          ${x.通知 ? `<button data-notice="${i}">报名通知</button>` : ''}
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+
+  $('#main').innerHTML = `<section class="zone" style="--c:var(--brand1)">
+    <div class="zone-head"><i></i><h2>${esc(CAL.页面名 || '正在报名')}</h2></div>
+    ${CAL.说明 ? `<p class="lead">${esc(CAL.说明)}</p>` : ''}
+    ${list.length ? `<div class="evs">${cards}</div>` : `<p class="none">${esc(CAL.空 || '暂时没有正在报名的比赛')}</p>`}
+    ${CAL.引导 ? `<p class="cal-cta">${esc(CAL.引导)}</p>` : ''}
+  </section>`;
+
+  // 报名通知 → 图片阅读器
+  $('#main').querySelectorAll('[data-notice]').forEach(btn => {
+    btn.onclick = () => {
+      const x = list[+btn.dataset.notice];
+      const n = +x.通知页数 || 1;
+      showDoc(x.名称 + ' · 报名通知', '', Array.from({ length: n }, (_, k) => `${x.通知}/${k + 1}.webp`));
+    };
+  });
+}
+
 /* ---------------- 作品列表 ---------------- */
 /* 奖项等级 → 角标配色（金/银/铜） */
 const lvOf = a => /[一特OF]/.test(a) ? 1 : /[二M]/.test(a) ? 2 : /三/.test(a) ? 3 : 0;
 
 function render() {
   if (view === 'feedback') return renderFeedback();
+  if (view === 'calendar') return renderCalendar();
   let h = '', i = 0;
   for (const [k, n] of COMPS) {
     if (filter !== 'all' && filter !== k) continue;
@@ -106,30 +175,36 @@ function loadPage(el) {
   probe.src = src;
 }
 
-function open(id) {
-  const p = PAPERS.find(x => x.id === id);
-  if (!p) return close();
+function showDoc(title, comp, urls, poster) {
   const my = ++seq;
   const v = $('#view');
-  $('#reader').style.setProperty('--c', `var(--${p.comp})`);
-  $('#rt').textContent = p.title;
-  total = p.pages;
+  $('#reader').style.setProperty('--c', comp ? `var(--${comp})` : 'var(--brand1)');
+  $('#rt').textContent = title;
+  total = urls.length;
   $('#pageno').textContent = '1 / ' + total;
-  v.innerHTML = Array.from({ length: p.pages }, (_, i) => `<div class="pg" data-n="${i + 1}" data-src="pages/${p.id}/${i + 1}.webp"></div>`).join('');
+  v.innerHTML = urls.map((u, i) => `<div class="pg" data-n="${i + 1}" data-src="${esc(u)}"></div>`).join('');
   $('#reader').hidden = false;
   document.body.style.overflow = 'hidden';
   v.scrollTop = 0;
-  document.title = p.title + ' · ' + (T.标题 || '数学建模作品集');
+  document.title = title + ' · ' + (T.标题 || '数学建模作品集');
   const pgs = v.querySelectorAll('.pg');
   // 先用卡片上已经缓存好的封面把第一页顶上，几秒的空窗就没了
-  if (pgs[0]) {
-    pgs[0].style.backgroundImage = `url("thumbs/${p.id}.jpg")`;
+  if (poster && pgs[0]) {
+    pgs[0].style.backgroundImage = `url("${poster}")`;
     pgs[0].classList.add('ok');
   }
   if (io) io.disconnect();
   io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && my === seq) loadPage(e.target); }), { root: v, rootMargin: '900px 0px' });
   pgs.forEach(el => io.observe(el));
   loadPage(pgs[0]);
+}
+
+function open(id) {
+  const p = PAPERS.find(x => x.id === id);
+  if (!p) return close();
+  showDoc(p.title, p.comp,
+    Array.from({ length: p.pages }, (_, i) => `pages/${p.id}/${i + 1}.webp`),
+    `thumbs/${p.id}.jpg`);
 }
 
 function close() {
@@ -229,20 +304,22 @@ document.addEventListener('dragstart', e => { if (e.target.closest('img,.pg')) e
 addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && /^[sp]$/i.test(e.key)) e.preventDefault(); });
 
 /* 路由 */
-$('#back').onclick = () => { location.hash = ''; };
+$('#back').onclick = () => { if (location.hash) location.hash = ''; else close(); };
 addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!$('#light').hidden) $('#light').hidden = true;
   else if (!$('#notice').hidden) closeNotice();
   else if (!$('#modal').hidden) $('#modal').hidden = true;
-  else if (!$('#reader').hidden) location.hash = '';
+  else if (!$('#reader').hidden) { if (location.hash) location.hash = ''; else close(); }
 });
 
 function route() {
   const id = location.hash.slice(1);
   if (/^p\d+$/.test(id) && PAPERS.some(p => p.id === id)) return open(id);
   close();
-  const v = (id === 'feedback' && (FB.图片 || []).length) ? id : 'list';
+  let v = 'list';
+  if (id === 'feedback' && (FB.图片 || []).length) v = 'feedback';
+  else if (id === 'calendar' && window.CALENDAR) v = 'calendar';
   if (v !== view) { view = v; nav(); render(); scrollTo(0, 0); }
 }
 addEventListener('hashchange', route);
