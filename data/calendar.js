@@ -90,6 +90,8 @@ window.CALENDAR = {
       跨校: '不允许',
       官网: 'https://www.contest.comap.com/undergraduate/contests/mcm/login.php',
       官网名: '报名官网',
+      图: 'logos/mcm.png',
+      图比例: '1006/250',
     },
   ],
 };
