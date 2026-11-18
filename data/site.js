@@ -23,5 +23,6 @@ window.SITE = {
   // 有作品了再加，例如 mcm: '美赛', huawei: '华为杯'
   赛事: {
     guosai: '国赛',
+    huawei: '研赛（华为杯）',
   },
 };
