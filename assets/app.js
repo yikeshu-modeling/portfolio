@@ -72,7 +72,7 @@ function render() {
       <div class="zone-head"><i></i><h2>${esc(n)}</h2></div>
       ${ps.length ? `<div class="grid">${ps.map(p => `<button class="card" data-id="${p.id}" style="--i:${i++}">
         <div class="cover"><img src="thumbs/${p.id}.jpg" alt="" loading="lazy"><span class="tag">${esc(p.letter)}</span>${p.award ? `<span class="aw" data-lv="${lvOf(p.award)}">${esc(p.award)}</span>` : ''}</div>
-        <p>${esc(p.title)}<small>${esc([p.year && p.year + ' 年', p.pages + ' 页'].filter(Boolean).join(' · '))}</small></p>
+        <p>${esc(p.title)}<small>${esc(p.year ? p.year + ' 年' : '')}</small></p>
       </button>`).join('')}</div>` : `<p class="none">暂无作品</p>`}
     </section>`;
   }
