@@ -27,7 +27,7 @@ nav{display:flex;flex-direction:column;gap:4px}
 .nav[aria-current="true"]{background:color-mix(in srgb,var(--c,var(--brand1)) 13%,transparent);color:var(--c,var(--brand1));font-weight:600}
 .nav[aria-current="true"] i{transform:scale(1.25)}
 .stamp{margin-top:auto;padding:0 13px;font-size:13px;line-height:1.55;color:var(--muted)}
-.foot{display:flex;gap:8px}
+.foot{display:flex;gap:8px;margin-top:auto}
 .pill{flex:1;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;font-size:15px;transition:background .2s,transform .15s}
 .pill:hover{background:var(--hover)}
 .pill:active{transform:scale(.97)}
