@@ -22,7 +22,7 @@ window.SITE = {
   // 赛事先在这里定义：key 用来和 papers.js 里的「赛事」对应，改了 key 论文会挂错区
   // 有作品了再加，例如 mcm: '美赛', huawei: '华为杯'
   赛事: {
-    guosai: '国赛',
+    guosai: '国赛（高教社杯）',
     huawei: '研赛（华为杯）',
   },
 };
