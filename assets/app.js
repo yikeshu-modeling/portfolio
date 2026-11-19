@@ -152,10 +152,15 @@ function render() {
       .sort((a, b) => (b.year - a.year) || String(a.letter).localeCompare(String(b.letter)));
     h += `<section class="zone" style="--c:var(--${k})">
       <div class="zone-head"><i></i><h2>${esc(n)}</h2></div>
-      ${ps.length ? `<div class="grid">${ps.map(p => `<button class="card" data-id="${p.id}" style="--i:${i++}">
-        <div class="cover"><img src="thumbs/${p.id}.jpg" alt="" loading="lazy">${p.letter ? `<span class="tag">${esc(p.letter)}</span>` : ''}${p.award ? `<span class="aw" data-lv="${lvOf(p.award)}">${esc(p.award)}</span>` : ''}</div>
+      ${ps.length ? `<div class="grid">${ps.map(p => {
+        const idx = i++;
+        // 首屏前 4 张立即加载（第一张高优先级），其余懒加载
+        const imgAttr = idx === 0 ? ' fetchpriority="high"' : (idx < 4 ? '' : ' loading="lazy"');
+        return `<button class="card" data-id="${p.id}" style="--i:${idx}">
+        <div class="cover"><img src="thumbs/${p.id}.jpg" alt=""${imgAttr}>${p.letter ? `<span class="tag">${esc(p.letter)}</span>` : ''}${p.award ? `<span class="aw" data-lv="${lvOf(p.award)}">${esc(p.award)}</span>` : ''}</div>
         <p>${esc(p.title)}<small>${esc(p.year ? p.year + ' 年' : '')}</small></p>
-      </button>`).join('')}</div>` : `<p class="none">暂无作品</p>`}
+      </button>`;
+      }).join('')}</div>` : `<p class="none">暂无作品</p>`}
     </section>`;
   }
   $('#main').innerHTML = h || `<p class="none">暂无作品</p>`;
