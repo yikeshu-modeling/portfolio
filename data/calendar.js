@@ -80,6 +80,8 @@ window.CALENDAR = {
       官网名: '报名官网',
       图: 'logos/huashu-en.jpg',
       图比例: '1400/302',
+      通知: 'notices/huashu-en',
+      通知页数: 1,
     },
     {
       名称: '2027 年第 43 届美国大学生数学建模竞赛（MCM/ICM）',
