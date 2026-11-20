@@ -38,9 +38,9 @@ main{padding:40px 48px 80px}
 .zone-head h2{margin:0;font-size:26px;font-weight:700;letter-spacing:.02em}
 .zone-head i{width:12px;height:12px;border-radius:4px;background:var(--c);box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 18%,transparent);flex:none}
 .zone-head::after{content:"";flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 40%,transparent),transparent)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
 .card{position:relative;display:flex;flex-direction:column;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:var(--shadow);
-  overflow:hidden;cursor:pointer;text-align:left;animation:rise .5s ease both;animation-delay:calc(var(--i) * 45ms);
+  overflow:hidden;cursor:pointer;text-align:left;animation:rise .5s ease both;animation-delay:calc(var(--i) * 45ms);max-width:380px;
   transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,border-color .25s}
 .card:hover{transform:translateY(-6px);box-shadow:var(--shadow-hi);border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
 .cover{position:relative;aspect-ratio:4/3;max-width:100%;overflow:hidden;background:#fff}
